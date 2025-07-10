@@ -10,6 +10,7 @@ import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -23,15 +24,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Extension
-public class GlobalConfiguration extends jenkins.model.GlobalConfiguration {
+public class BuildkiteConfiguration extends GlobalConfiguration {
     private String baseUrl = "https://api.buildkite.com/";
     private String credentialsId;
 
-    public static GlobalConfiguration get() {
-        return ExtensionList.lookupSingleton(GlobalConfiguration.class);
+    public static BuildkiteConfiguration get() {
+        return ExtensionList.lookupSingleton(BuildkiteConfiguration.class);
     }
 
-    public GlobalConfiguration() {
+    public BuildkiteConfiguration() {
         load();
     }
 
