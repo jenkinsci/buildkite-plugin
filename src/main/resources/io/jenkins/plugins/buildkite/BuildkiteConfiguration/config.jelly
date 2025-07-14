@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?jelly escape-by-default='true'?>
+<!-- DISABLED UNTIL NEEDED
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
     <f:section title="Buildkite Plugin">
 
@@ -18,3 +19,4 @@
 
     </f:section>
 </j:jelly>
+-->
