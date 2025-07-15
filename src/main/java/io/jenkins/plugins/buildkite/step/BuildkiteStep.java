@@ -22,6 +22,7 @@ public class BuildkiteStep extends Step {
     private String branch;
     private String commit;
     private String message;
+    private boolean async;
 
     @DataBoundConstructor
     public BuildkiteStep(String organization, String pipeline, String credentialsId) {
@@ -35,6 +36,7 @@ public class BuildkiteStep extends Step {
         // in the @DataBoundSetter set* methods below.
         this.branch = "main";
         this.commit = "HEAD";
+        this.async = false;
     }
 
     @Override
@@ -78,6 +80,10 @@ public class BuildkiteStep extends Step {
         return message;
     }
 
+    public boolean isAsync() {
+        return async;
+    }
+
     @DataBoundSetter
     public void setBranch(String branch) {
         if (branch == null || branch.trim().isEmpty()) return;
@@ -95,6 +101,11 @@ public class BuildkiteStep extends Step {
     @DataBoundSetter
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    @DataBoundSetter
+    public void setAsync(boolean async) {
+        this.async = async;
     }
 
     @Extension

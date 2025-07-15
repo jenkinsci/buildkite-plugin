@@ -66,6 +66,12 @@ public class BuildkiteStepExecution extends SynchronousNonBlockingStepExecution<
 
         printBuildCreated(build, console);
 
+        if (this.step.isAsync()) {
+            this.getContext().onSuccess(build);
+
+            return null;
+        }
+
         console.println("Waiting for build to finish");
 
         Thread.sleep(2000);
