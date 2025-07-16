@@ -4,12 +4,15 @@ import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Result;
+import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.security.ACL;
 import io.jenkins.plugins.buildkite.api_client.BuildkiteApiClient;
 import io.jenkins.plugins.buildkite.api_client.BuildkiteBuild;
 import io.jenkins.plugins.buildkite.api_client.CreateBuildRequest;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+import org.jenkinsci.plugins.workflow.cps.CpsFlowExecution;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
@@ -19,6 +22,7 @@ import java.io.PrintStream;
 public class BuildkiteStepExecution extends SynchronousNonBlockingStepExecution<Void> {
     private static final long serialVersionUID = 1L; // Required for Serializable interface
     private transient final BuildkiteStep step;
+    private boolean buildPaused = false;
 
     public BuildkiteStepExecution(@NonNull BuildkiteStep step, @NonNull StepContext context) {
         super(context);
@@ -47,8 +51,6 @@ public class BuildkiteStepExecution extends SynchronousNonBlockingStepExecution<
             console.println(errorMessage);
 
             this.getContext().onFailure(new FlowInterruptedException(Result.FAILURE));
-
-            return null;
         }
 
         var client = new BuildkiteApiClient(credentials.getSecret());
@@ -85,7 +87,23 @@ public class BuildkiteStepExecution extends SynchronousNonBlockingStepExecution<
             );
             console.println(String.format("  %s", pollingBuild.getState()));
 
-            Thread.sleep(7000);
+            try {
+                Thread.sleep(7000);
+            } catch (InterruptedException e) {
+                console.println("Wait canceled");
+
+                this.getContext().onFailure(new FlowInterruptedException(Result.FAILURE));
+            }
+
+            if (this.buildPaused = this.isBuildPaused()) {
+                break;
+            }
+        }
+
+        if (this.buildPaused) {
+            console.println("Wait canceled - Jenkins build was paused.");
+            this.getContext().onFailure(new FlowInterruptedException(Result.FAILURE));
+            return null;
         }
 
         printBuildFinished(pollingBuild, console);
@@ -129,5 +147,21 @@ public class BuildkiteStepExecution extends SynchronousNonBlockingStepExecution<
                 build.getState()
         );
         console.println(message);
+    }
+
+    private boolean isBuildPaused() {
+        Run<?, ?> run = null;
+
+        try {
+            run = getContext().get(Run.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (run instanceof WorkflowRun workflowRun) {
+            var execution = (CpsFlowExecution) workflowRun.getExecution();
+            return execution != null && execution.isPaused();
+        }
+        return false;
     }
 }
