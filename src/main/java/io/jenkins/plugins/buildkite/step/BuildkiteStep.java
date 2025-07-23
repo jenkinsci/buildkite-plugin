@@ -1,14 +1,24 @@
 package io.jenkins.plugins.buildkite.step;
 
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import hudson.Extension;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.security.ACL;
+import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
 
 import java.util.Set;
 import java.util.logging.Logger;
@@ -121,6 +131,36 @@ public class BuildkiteStep extends Step {
         @Override
         public String getFunctionName() {
             return "buildkite";
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Trigger a Buildkite Build";
+        }
+
+        public FormValidation doCheckOrganization(@QueryParameter String value) {
+            if (StringUtils.isEmpty(value)) {
+                return FormValidation.error("Organization is required");
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckPipeline(@QueryParameter String value) {
+            if (StringUtils.isEmpty(value)) {
+                return FormValidation.error("Pipeline is required");
+            }
+            return FormValidation.ok();
+        }
+
+        public ListBoxModel doFillCredentialsIdItems(
+                @AncestorInPath Item item,
+                @QueryParameter String credentialsId
+        ) {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
+            return (new StandardListBoxModel())
+                    .includeEmptyValue()
+                    .includeAs(ACL.SYSTEM2, item, StringCredentials.class);
         }
     }
 }
