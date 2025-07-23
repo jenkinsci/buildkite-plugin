@@ -12,6 +12,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class BuildkiteApiClient {
     private static final ObjectMapper MAPPER = new ObjectMapper()
@@ -45,16 +46,13 @@ public class BuildkiteApiClient {
             throw new RuntimeException(e);
         }
 
-        request.setEntity(new StringEntity(requestJson));
+        request.setEntity(new StringEntity(requestJson, StandardCharsets.UTF_8));
 
-        CloseableHttpResponse response = null;
-        try {
-            response = this.httpClient.execute(request);
+        try (CloseableHttpResponse response = this.httpClient.execute(request)) {
+            return responseToBuildkiteBuild(response);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        return responseToBuildkiteBuild(response);
     }
 
     public BuildkiteBuild getBuild(String organization, String pipeline, int buildNumber) {
@@ -70,14 +68,11 @@ public class BuildkiteApiClient {
         request.setHeader("Authorization", String.format("Bearer %s", this.apiToken.getPlainText()));
         request.setHeader("Content-Type", "application/json");
 
-        CloseableHttpResponse response = null;
-        try {
-            response = this.httpClient.execute(request);
+        try (CloseableHttpResponse response = this.httpClient.execute(request)) {
+            return responseToBuildkiteBuild(response);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        return responseToBuildkiteBuild(response);
     }
 
     private BuildkiteBuild responseToBuildkiteBuild(CloseableHttpResponse response) {

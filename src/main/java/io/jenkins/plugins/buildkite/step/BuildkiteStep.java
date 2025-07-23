@@ -110,6 +110,8 @@ public class BuildkiteStep extends Step {
 
     @DataBoundSetter
     public void setMessage(String message) {
+        if (message == null || message.trim().isEmpty()) return;
+
         this.message = message;
     }
 
