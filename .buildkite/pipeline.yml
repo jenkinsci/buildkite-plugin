@@ -1,0 +1,19 @@
+steps:
+  - label: ":maven: Build & Test"
+    command: |
+      echo "--- :maven: mvn dependency:go-offline -B"
+      mvn dependency:go-offline -B
+      echo "--- :maven: mvn hpi:resolve-test-dependencies -B"
+      mvn hpi:resolve-test-dependencies -B
+      echo "--- :maven: mvn verify"
+      mvn verify
+
+    plugins:
+      - docker#v5.13.0:
+          image: "maven:3-eclipse-temurin-22-alpine"
+          volumes:
+            - ".:/workspace"
+          workdir: "/workspace"
+    artifact_paths:
+      - "target/*.hpi"
+      - "target/surefire-reports/**/*"
