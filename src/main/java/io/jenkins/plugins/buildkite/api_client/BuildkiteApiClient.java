@@ -27,7 +27,7 @@ public class BuildkiteApiClient {
         this.httpClient = HttpClient.getCloseableHttpClient();
     }
 
-    public BuildkiteBuild createBuild(String organization, String pipeline, CreateBuildRequest createBuildRequest) {
+    public BuildkiteBuild createBuild(String organization, String pipeline, CreateBuildRequest createBuildRequest) throws BuildkiteApiException {
         var url = String.format(
                 "%s/organizations/%s/pipelines/%s/builds",
                 BUILDKITE_API_BASE,
@@ -49,13 +49,13 @@ public class BuildkiteApiClient {
         request.setEntity(new StringEntity(requestJson, StandardCharsets.UTF_8));
 
         try (CloseableHttpResponse response = this.httpClient.execute(request)) {
-            return responseToBuildkiteBuild(response);
+            return handleResponse(response);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public BuildkiteBuild getBuild(String organization, String pipeline, int buildNumber) {
+    public BuildkiteBuild getBuild(String organization, String pipeline, int buildNumber) throws BuildkiteApiException {
         var url = String.format(
                 "%s/organizations/%s/pipelines/%s/builds/%s",
                 BUILDKITE_API_BASE,
@@ -69,10 +69,27 @@ public class BuildkiteApiClient {
         request.setHeader("Content-Type", "application/json");
 
         try (CloseableHttpResponse response = this.httpClient.execute(request)) {
-            return responseToBuildkiteBuild(response);
+            return handleResponse(response);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private BuildkiteBuild handleResponse(CloseableHttpResponse response) throws BuildkiteApiException {
+        int statusCode = response.getCode();
+
+        if (statusCode < 200 || statusCode >= 400) {
+            try {
+                String responseBody = (response.getEntity() != null)
+                        ? new String(response.getEntity().getContent().readAllBytes(), StandardCharsets.UTF_8)
+                        : "";
+                throw new BuildkiteApiException(statusCode, responseBody);
+            } catch (IOException e) {
+                throw new BuildkiteApiException(statusCode, "", e);
+            }
+        }
+
+        return responseToBuildkiteBuild(response);
     }
 
     private BuildkiteBuild responseToBuildkiteBuild(CloseableHttpResponse response) {

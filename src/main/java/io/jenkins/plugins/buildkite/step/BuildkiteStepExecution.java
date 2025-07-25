@@ -8,6 +8,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.security.ACL;
 import io.jenkins.plugins.buildkite.api_client.BuildkiteApiClient;
+import io.jenkins.plugins.buildkite.api_client.BuildkiteApiException;
 import io.jenkins.plugins.buildkite.api_client.BuildkiteBuild;
 import io.jenkins.plugins.buildkite.api_client.CreateBuildRequest;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
@@ -43,11 +44,19 @@ public class BuildkiteStepExecution extends SynchronousNonBlockingStepExecution<
 
         BuildkiteApiClient client = new BuildkiteApiClient(credentials.getSecret());
 
-        BuildkiteBuild build = client.createBuild(
-                this.step.getOrganization(),
-                this.step.getPipeline(),
-                generateCreateBuildRequest()
-        );
+        BuildkiteBuild build;
+        try {
+            build = client.createBuild(
+                    this.step.getOrganization(),
+                    this.step.getPipeline(),
+                    generateCreateBuildRequest()
+            );
+        } catch (BuildkiteApiException e) {
+            var errorMessage = String.format("Failed to create Buildkite build: %s", e.getMessage());
+            console.println(errorMessage);
+            this.getContext().onFailure(new FlowInterruptedException(Result.FAILURE));
+            return null;
+        }
 
         printBuildCreated(build, console);
 
@@ -93,11 +102,19 @@ public class BuildkiteStepExecution extends SynchronousNonBlockingStepExecution<
 
         BuildkiteBuild pollingBuild = null;
         while (pollingBuild == null || !pollingBuild.buildFinished()) {
-            pollingBuild = client.getBuild(
-                    this.step.getOrganization(),
-                    this.step.getPipeline(),
-                    build.getNumber()
-            );
+            try {
+                pollingBuild = client.getBuild(
+                        this.step.getOrganization(),
+                        this.step.getPipeline(),
+                        build.getNumber()
+                );
+            } catch (BuildkiteApiException e) {
+                var errorMessage = String.format("Failed to get Buildkite build status: %s", e.getMessage());
+                console.println(errorMessage);
+                this.getContext().onFailure(new FlowInterruptedException(Result.FAILURE));
+                return null;
+            }
+
             console.println(String.format("  %s", pollingBuild.getState()));
 
             try {

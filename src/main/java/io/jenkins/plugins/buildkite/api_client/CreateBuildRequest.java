@@ -9,23 +9,26 @@ public class CreateBuildRequest {
         return commit;
     }
 
-    public void setCommit(String commit) {
+    public CreateBuildRequest setCommit(String commit) {
         this.commit = commit;
+        return this;
     }
 
     public String getBranch() {
         return branch;
     }
 
-    public void setBranch(String branch) {
+    public CreateBuildRequest setBranch(String branch) {
         this.branch = branch;
+        return this;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public CreateBuildRequest setMessage(String message) {
         this.message = message;
+        return this;
     }
 }
