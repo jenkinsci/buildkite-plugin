@@ -19,6 +19,7 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.verb.POST;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -85,6 +86,7 @@ public class BuildkiteConfiguration extends GlobalConfiguration {
                 .includeCurrentValue(credentialsId);
     }
 
+    @POST
     public FormValidation doTestConnection(
             @QueryParameter("baseUrl") String baseUrl,
             @QueryParameter("credentialsId") String credentialsId
