@@ -93,24 +93,24 @@ public class BuildkiteApiClient {
     }
 
     private BuildkiteBuild responseToBuildkiteBuild(CloseableHttpResponse response) {
-        var build = new BuildkiteBuild();
+        var builder = BuildkiteBuild.builder();
 
         try {
             JsonNode json = MAPPER.readTree(response.getEntity().getContent());
 
-            build
-                    .setId(json.get("id").asText())
-                    .setNumber(json.get("number").asInt())
-                    .setState(json.get("state").asText())
-                    .setWebUrl(json.get("web_url").asText())
-                    .setCommit(json.get("commit").asText())
-                    .setBranch(json.get("branch").asText())
-                    .setUrl(json.get("url").asText());
+            builder
+                    .id(json.get("id").asText())
+                    .number(json.get("number").asInt())
+                    .state(json.get("state").asText())
+                    .webUrl(json.get("web_url").asText())
+                    .commit(json.get("commit").asText())
+                    .branch(json.get("branch").asText())
+                    .url(json.get("url").asText());
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        return build;
+        return builder.build();
     }
 }

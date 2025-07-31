@@ -86,10 +86,11 @@ class BuildkiteStepExecutionTest {
     @Test
     void waitForBuildCompletion_buildPassesImmediately() throws Exception {
         var mockClient = mock(BuildkiteApiClient.class);
-        var initialBuild = new BuildkiteBuild().setNumber(123);
-        var finishedBuild = new BuildkiteBuild()
-                .setNumber(123)
-                .setState("passed");
+        var initialBuild = BuildkiteBuild.builder().number(123).build();
+        var finishedBuild = BuildkiteBuild.builder()
+                .number(123)
+                .state("passed")
+                .build();
 
         var testStepExecution = new NoSleepBuildkiteStepExecution(step, mockContext);
 
@@ -116,10 +117,11 @@ class BuildkiteStepExecutionTest {
     @Test
     void waitForBuildCompletion_buildFails() throws Exception {
         var mockClient = mock(BuildkiteApiClient.class);
-        var initialBuild = new BuildkiteBuild().setNumber(456);
-        var failedBuild = new BuildkiteBuild()
-                .setNumber(456)
-                .setState("failed");
+        var initialBuild = BuildkiteBuild.builder().number(456).build();
+        var failedBuild = BuildkiteBuild.builder()
+                .number(456)
+                .state("failed")
+                .build();
 
         var testStepExecution = new NoSleepBuildkiteStepExecution(step, mockContext);
 
@@ -146,16 +148,18 @@ class BuildkiteStepExecutionTest {
     @Test
     void waitForBuildCompletion_buildRunningThenPasses() throws Exception {
         var mockClient = mock(BuildkiteApiClient.class);
-        var initialBuild = new BuildkiteBuild().setNumber(789);
+        var initialBuild = BuildkiteBuild.builder().number(789).build();
 
         var testStepExecution = new NoSleepBuildkiteStepExecution(step, mockContext);
 
-        var runningBuild = new BuildkiteBuild()
-                .setNumber(789)
-                .setState("running");
-        var passedBuild = new BuildkiteBuild()
-                .setNumber(789)
-                .setState("passed");
+        var runningBuild = BuildkiteBuild.builder()
+                .number(789)
+                .state("running")
+                .build();
+        var passedBuild = BuildkiteBuild.builder()
+                .number(789)
+                .state("passed")
+                .build();
 
         when(mockClient.getBuild("test-org", "test-pipeline", 789))
                 .thenReturn(runningBuild)
@@ -201,9 +205,10 @@ class BuildkiteStepExecutionTest {
         );
         method.setAccessible(true);
 
-        var build = new BuildkiteBuild()
-                .setNumber(123)
-                .setWebUrl("https://buildkite.com/test-org/test-pipeline/builds/123");
+        var build = BuildkiteBuild.builder()
+                .number(123)
+                .webUrl("https://buildkite.com/test-org/test-pipeline/builds/123")
+                .build();
 
         method.invoke(stepExecution, build, mockConsole);
 
@@ -221,9 +226,10 @@ class BuildkiteStepExecutionTest {
         );
         method.setAccessible(true);
 
-        var build = new BuildkiteBuild()
-                .setNumber(456)
-                .setState("passed");
+        var build = BuildkiteBuild.builder()
+                .number(456)
+                .state("passed")
+                .build();
 
         method.invoke(stepExecution, build, mockConsole);
 
