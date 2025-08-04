@@ -6,10 +6,7 @@ import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.security.ACL;
-import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -140,25 +137,11 @@ public class BuildkiteStep extends Step {
             return "Trigger a Buildkite Build";
         }
 
-        public FormValidation doCheckOrganization(@QueryParameter String value) {
-            if (StringUtils.isEmpty(value)) {
-                return FormValidation.error("Organization is required");
-            }
-            return FormValidation.ok();
-        }
-
-        public FormValidation doCheckPipeline(@QueryParameter String value) {
-            if (StringUtils.isEmpty(value)) {
-                return FormValidation.error("Pipeline is required");
-            }
-            return FormValidation.ok();
-        }
-
         public ListBoxModel doFillCredentialsIdItems(
                 @AncestorInPath Item item,
                 @QueryParameter String credentialsId
         ) {
-            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+            item.checkPermission(Item.BUILD);
 
             return (new StandardListBoxModel())
                     .includeEmptyValue()
