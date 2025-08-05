@@ -7,7 +7,6 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.security.ACL;
 import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
 import lombok.Getter;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.jenkinsci.plugins.workflow.steps.Step;
