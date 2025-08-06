@@ -12,7 +12,7 @@
 
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>buildkite</artifactId>
-    <version>${revision}${changelist}</version>
+    <version>${revision}.${changelist}</version>
     <packaging>hpi</packaging>
 
     <name>Buildkite Plugin</name>
@@ -31,7 +31,7 @@
     </scm>
 
     <properties>
-        <changelist>-SNAPSHOT</changelist>
+        <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <jenkins.baseline>2.492</jenkins.baseline>
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
