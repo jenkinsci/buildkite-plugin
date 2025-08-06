@@ -89,11 +89,11 @@ public class BuildkiteStepExecution extends SynchronousNonBlockingStepExecution<
     }
 
     private CreateBuildRequest generateCreateBuildRequest() {
-        var createBuildRequest = new CreateBuildRequest();
-        createBuildRequest.setBranch(this.step.getBranch());
-        createBuildRequest.setCommit(this.step.getCommit());
-        createBuildRequest.setMessage(this.step.getMessage());
-        return createBuildRequest;
+        return CreateBuildRequest.builder()
+                .branch(this.step.getBranch())
+                .commit(this.step.getCommit())
+                .message(this.step.getMessage())
+                .build();
     }
 
     private Void waitForBuildCompletion(BuildkiteApiClient client, BuildkiteBuild build, PrintStream console) throws Exception {

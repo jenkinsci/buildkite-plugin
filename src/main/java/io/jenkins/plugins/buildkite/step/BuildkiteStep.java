@@ -7,6 +7,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.security.ACL;
 import hudson.util.ListBoxModel;
+import lombok.Getter;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -23,13 +24,13 @@ import java.util.logging.Logger;
 public class BuildkiteStep extends Step {
     private static final Logger LOGGER = Logger.getLogger(BuildkiteStep.class.getName());
 
-    private final String organization;
-    private final String pipeline;
-    private final String credentialsId;
-    private String branch;
-    private String commit;
-    private String message;
-    private boolean async;
+    @Getter private final String organization;
+    @Getter private final String pipeline;
+    @Getter private final String credentialsId;
+    @Getter private String branch;
+    @Getter private String commit;
+    @Getter private String message;
+    @Getter private boolean async;
 
     @DataBoundConstructor
     public BuildkiteStep(String organization, String pipeline, String credentialsId) {
@@ -61,34 +62,6 @@ public class BuildkiteStep extends Step {
         }
 
         return new BuildkiteStepExecution(this, context);
-    }
-
-    public String getOrganization() {
-        return organization;
-    }
-
-    public String getPipeline() {
-        return pipeline;
-    }
-
-    public String getCredentialsId() {
-        return credentialsId;
-    }
-
-    public String getBranch() {
-        return branch;
-    }
-
-    public String getCommit() {
-        return commit;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public boolean isAsync() {
-        return async;
     }
 
     @DataBoundSetter

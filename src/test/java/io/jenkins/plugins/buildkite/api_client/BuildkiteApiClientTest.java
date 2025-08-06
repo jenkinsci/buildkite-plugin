@@ -64,10 +64,11 @@ class BuildkiteApiClientTest {
 
             client = mockClientReturningHttpResponse(mockedHttpClient, 201, responseJson);
 
-            var request = new CreateBuildRequest()
-                    .setCommit("abc123def")
-                    .setBranch("main")
-                    .setMessage("Test build");
+            var request = CreateBuildRequest.builder()
+                    .commit("abc123def")
+                    .branch("main")
+                    .message("Test build")
+                    .build();
 
             BuildkiteBuild result = client.createBuild("my-org", "my-pipeline", request);
 
@@ -90,10 +91,11 @@ class BuildkiteApiClientTest {
             String errorResponseBody = "Pipeline not found";
             client = mockClientReturningHttpResponse(mockedHttpClient, 404, errorResponseBody);
 
-            var request = new CreateBuildRequest()
-                    .setCommit("abc123def")
-                    .setBranch("main")
-                    .setMessage("Test build");
+            var request = CreateBuildRequest.builder()
+                    .commit("abc123def")
+                    .branch("main")
+                    .message("Test build")
+                    .build();
 
             var exception = assertThrows(BuildkiteApiException.class, () -> {
                 client.createBuild("my-org", "nonexistent-pipeline", request);
@@ -109,10 +111,11 @@ class BuildkiteApiClientTest {
         try (MockedStatic<HttpClient> mockedHttpClient = mockStatic(HttpClient.class)) {
             client = mockClientThrowingIOException(mockedHttpClient, "Network error");
 
-            var request = new CreateBuildRequest()
-                    .setCommit("abc123def")
-                    .setBranch("main")
-                    .setMessage("Test build");
+            var request = CreateBuildRequest.builder()
+                    .commit("abc123def")
+                    .branch("main")
+                    .message("Test build")
+                    .build();
 
             var exception = assertThrows(RuntimeException.class, () -> {
                 client.createBuild("my-org", "my-pipeline", request);
@@ -188,10 +191,11 @@ class BuildkiteApiClientTest {
         try (MockedStatic<HttpClient> mockedHttpClient = mockStatic(HttpClient.class)) {
             client = mockClientReturningHttpResponse(mockedHttpClient, 500, "Internal server error");
 
-            var request = new CreateBuildRequest()
-                    .setCommit("abc123def")
-                    .setBranch("main")
-                    .setMessage("Test build");
+            var request = CreateBuildRequest.builder()
+                    .commit("abc123def")
+                    .branch("main")
+                    .message("Test build")
+                    .build();
 
             var exception = assertThrows(BuildkiteApiException.class, () -> {
                 client.createBuild("my-org", "my-pipeline", request);
@@ -207,10 +211,11 @@ class BuildkiteApiClientTest {
         try (MockedStatic<HttpClient> mockedHttpClient = mockStatic(HttpClient.class)) {
             client = mockClientReturningHttpResponseWithNullEntity(mockedHttpClient, 400);
 
-            var request = new CreateBuildRequest()
-                    .setCommit("abc123def")
-                    .setBranch("main")
-                    .setMessage("Test build");
+            var request = CreateBuildRequest.builder()
+                    .commit("abc123def")
+                    .branch("main")
+                    .message("Test build")
+                    .build();
 
             var exception = assertThrows(BuildkiteApiException.class, () -> {
                 client.createBuild("my-org", "my-pipeline", request);
